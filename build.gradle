@@ -25,7 +25,7 @@ pythonLibrary {
 }
 
 // Apply the testing plugin
-// apply plugin: 'com.palantir.transforms.lang.pytest-defaults'
+apply plugin: 'com.palantir.transforms.lang.pytest-defaults'
 
 // Apply the linting plugins
 // apply plugin: 'com.palantir.conda.pep8'
