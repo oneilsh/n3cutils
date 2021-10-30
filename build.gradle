@@ -20,6 +20,10 @@ buildscript {
 apply plugin: 'com.palantir.transforms.lang.python-library'
 apply plugin: 'com.palantir.transforms.lang.python-library-defaults'
 
+pythonLibrary {	
+    publishChannelName = 'libs'	
+}
+
 // Apply the testing plugin
 // apply plugin: 'com.palantir.transforms.lang.pytest-defaults'
 
