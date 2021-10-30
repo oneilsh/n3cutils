@@ -1,10 +1,10 @@
-from transforms.api import TransformInput
+from transforms.api import transform, Input
 
 
+@transform(
+     cs=Input('/N3C Export Area/Concept Set Ontology/Concept Set Ontology/hubble_base/concept_set_members'),
+     # processed=Output('/examples/hair_eye_color_processed')
+)
 def concept_set_members():
-    return TransformInput('ri.foundry.main.dataset.e670c5ad-42ca-46a2-ae55-e917e3e161b6')
-
-
-def test_concept_set_members():
-    print(concept_set_members())
-    return True
+    filtered_df = cs.dataframe()
+    return filtered_df
