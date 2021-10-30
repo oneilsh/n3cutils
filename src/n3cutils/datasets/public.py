@@ -1,3 +1,5 @@
-from transforms.api import Input
+from transforms.api import TransformInput
 
-concept_set_members = Input('/N3C Export Area/Concept Set Ontology/Concept Set Ontology/hubble_base/concept_set_members')
+
+concept_set_members = TransformInput('ri.foundry.main.dataset.e670c5ad-42ca-46a2-ae55-e917e3e161b6')
+
