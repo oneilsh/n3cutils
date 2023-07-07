@@ -16,7 +16,6 @@ requirements:
   run:
     - numpy
     - pandas
-    - foundry-transforms-lib-python
 
 test:
   requires:
