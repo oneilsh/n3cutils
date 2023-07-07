@@ -3,7 +3,7 @@ from pyspark.sql.functions import col, datediff, lit, concat, concat_ws, mean, s
 from pyspark.sql.types import StringType, ArrayType, IntegerType
 from pyspark.ml.linalg import Vectors
 from pyspark.ml import Pipeline
-
+import math
 
 def vectorize(df, boolean_cols = [], 
                   continuous_cols = [],
@@ -48,6 +48,14 @@ def vectorize(df, boolean_cols = [],
 
     if len(keep_cols) > 0:
         df = df.join(keep_df, id_col)
+
+    if batch_size > 0:
+        total_rows = df.count()
+        num_batches = math.ceil(total_rows / batch_size)  # Total number of rows divided by your batch size, rounded up
+
+        # Repartition the DataFrame based on the batch size
+        df = df.repartition(num_batches)
+
 
     return df
 
