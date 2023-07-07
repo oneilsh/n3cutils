@@ -16,11 +16,11 @@ requirements:
   run:
     - numpy
     - pandas
-    - foundry-transforms-lib-python 0.336.0
+    - foundry-transforms-lib-python 0.306.0
 
 test:
   requires:
-    - foundry-transforms-lib-python 0.336.0
+    - foundry-transforms-lib-python 0.306.0
 
 build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
