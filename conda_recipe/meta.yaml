@@ -16,9 +16,11 @@ requirements:
   run:
     - numpy
     - pandas
+    - foundry-transforms-lib-python
 
 test:
   requires:
+    - foundry-transforms-lib-python
 
 build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
