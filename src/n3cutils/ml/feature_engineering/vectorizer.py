@@ -188,9 +188,6 @@ def vectorize_dates(df,
 
     # we need to add in these new columns via this strange select; the datediff above redefines
     # each date column as an integer, but we have to run them through select (delayed eval...?)
-    # but since the new version is transformed with the same name, we need to not try and select the
-    # originals or we'll get duplicate cols
-    date_cols_transformed_names = [c for c in date_cols] # and somehow this magically converts the column objects to strings for use in the select
     df = df.select(*df.columns, *date_cols_transformed)
 
 
@@ -226,7 +223,7 @@ def vectorize_dates(df,
     ## drop source cols if asked
     if drop:
         df = df.drop(*date_cols)
-    
+
 
     return df
 
