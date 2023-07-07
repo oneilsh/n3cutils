@@ -10,16 +10,20 @@ source:
 
 requirements:
   build:
-    - python 3.6.*
+    - python
     - setuptools
 
   # Any packages required to run your package
   run:
-    - python 3.6.*
+    - python
     - numpy
     - pandas
     - foundry-transforms-lib-python
     - pytest
+
+test:
+  requires:
+    - python
 
 build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
