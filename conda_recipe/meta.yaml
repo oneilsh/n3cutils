@@ -15,12 +15,9 @@ requirements:
   run:
     - numpy
     - pandas
-    - foundry-transforms-lib-python
-    - pytest 5.3.5
 
 test:
   requires:
-    - pytest 5.3.5
 
 build:
   script: python setup.py install --single-version-externally-managed --record=record.txt
