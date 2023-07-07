@@ -13,11 +13,11 @@ from pyspark.ml.linalg import VectorUDT
 def partitions_to_pandas_generator(df):
     num_partitions = df.rdd.getNumPartitions()
 
-    vector_columns = [f.name for f in df.schema.fields if isinstance(f.dataType, VectorUDT)]
+    # vector_columns = [f.name for f in df.schema.fields if isinstance(f.dataType, VectorUDT)]
 
-    print(vector_columns)
+    # print(vector_columns)
 
-    return None
+    # return None
 
     for partition_index in range(num_partitions):
         part_rdd = df.rdd.mapPartitionsWithIndex(lambda index, value: value if index == partition_index else iter([]))
@@ -27,6 +27,8 @@ def partitions_to_pandas_generator(df):
 
         # convert to pandas dataframe
         pd_df = pd.DataFrame(data_partitioned, columns=df.columns)
+
+        yield pd_df
 
 
 
