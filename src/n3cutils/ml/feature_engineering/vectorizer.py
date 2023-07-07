@@ -5,7 +5,7 @@ from pyspark.ml.linalg import Vectors
 from pyspark.ml import Pipeline
 
 
-def vectorize(df, boolean_cols = [],
+def vectorize(df, boolean_cols = [], 
                   continuous_cols = [],
                   date_cols = [],
                   categorical_cols = [],
