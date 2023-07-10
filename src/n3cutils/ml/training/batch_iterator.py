@@ -56,7 +56,9 @@ def loop_over_batches(df: DataFrame,
     IMPORTANT: This method reads each batch of the dataframe in serial, which is appropriate for
     applications supporting incremental training (such as deep learning) when spark-based parallelization 
     is not available and the total data will not fit in memory. For applications where chunks of data 
-    can be analyzed independently and the results collected, spark's parallelization features should be used.
+    can be analyzed independently and the results collected, spark's parallelization features should be used. 
+    Spark's mllib also implements a number of spark-native implementation of machine learning models,
+    including logistic regression, k-means clustering, word2vec, and others..
     """
 
     start_time = time.time()
