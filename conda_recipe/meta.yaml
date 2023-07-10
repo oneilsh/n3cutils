@@ -15,6 +15,7 @@ requirements:
   run:
     - numpy
     - pandas
+    - psutil
 
 test:
   requires:
