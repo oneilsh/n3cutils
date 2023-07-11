@@ -4,7 +4,6 @@
 
 import time
 import pandas as pd
-import numpy as np
 import math
 from pyspark.ml.linalg import Vector
 import os
@@ -14,15 +13,15 @@ from typing import Generator
 
 
 
-def loop_over_batches(df: DataFrame, 
-                      max_rows_per_batch: int = 10000, 
+def loop_over_batches(df: DataFrame,
+                      max_rows_per_batch: int = 10000,
                       verbose: bool = True) -> Generator[pd.DataFrame, None, None]:
     """
     Given a spark dataframe, produces a generator yielding pandas dataframes of a specified size
     over all the rows of the dataframe. This can be used to process the entire dataframe
-    in batches, each converted to a pandas dataframe of a size that fits within the memory 
+    in batches, each converted to a pandas dataframe of a size that fits within the memory
     of the driver. Example usage also showing feature vectorization:
-    
+
     from n3cutils.ml.feature_engineering.vectorizer import vectorize
     from n3cutils.ml.training.batch_iterator import loop_over_batches
     from n3cutils.ml.feature_engineering.utils import cols_to_numpy_arrays
@@ -43,20 +42,20 @@ def loop_over_batches(df: DataFrame,
         # do some work...
 
     Rows of the dataframe are distributed into partitions of roughly equal size, but it should not be
-    assumed that each pandas_ds will have the same number of rows. 
+    assumed that each pandas_ds will have the same number of rows.
 
-    Generally, you will want to use large batch sizes to minimize data collection overhead. 
+    Generally, you will want to use large batch sizes to minimize data collection overhead.
     The number of rows to specify will thus be a function of 1) the memory resources available, primarily
     on the driver but also on the executors where the conversion to pandas dataframes happens, and 2) the
     size and number of columns. Of course, your analysis or model will be competing for memory use as well.
     To help tune the batch size, by default `verbose = True` and rough memory usage statistics are reported
     in the logs as batches are processed. Note however that when the batch size is too large memory
-    will be exhausted before logs can be generated. 
+    will be exhausted before logs can be generated.
 
     IMPORTANT: This method reads each batch of the dataframe in serial, which is appropriate for
-    applications supporting incremental training (such as deep learning) when spark-based parallelization 
-    is not available and the total data will not fit in memory. For applications where chunks of data 
-    can be analyzed independently and the results collected, spark's parallelization features should be used. 
+    applications supporting incremental training (such as deep learning) when spark-based parallelization
+    is not available and the total data will not fit in memory. For applications where chunks of data
+    can be analyzed independently and the results collected, spark's parallelization features should be used.
     Spark's mllib also implements a number of spark-native implementation of machine learning models,
     including logistic regression, k-means clustering, word2vec, and others..
     """
@@ -78,8 +77,27 @@ def loop_over_batches(df: DataFrame,
     if verbose:
         _log_it(f"Collecting first partition, dataframe total rows: {total_rows}, num partitions: {num_partitions}", start_time)
 
-    columns = df.schema.fieldNames()
-    for partition in df.rdd.mapPartitions(lambda iterator: [pd.DataFrame(list(iterator), columns=columns)]).toLocalIterator():
+    def convert_to_pandas(iterator):
+        rows = list(iterator)
+
+        # If there are no rows, return an empty pandas DataFrame
+        if not rows:
+            return pd.DataFrame()
+
+        # Convert Spark Rows to dictionaries
+        dicts = [row.asDict() for row in rows]
+
+        # Convert VectorUDTs to numpy arrays
+        for d in dicts:
+            for k, v in d.items():
+                if isinstance(v, Vector):
+                    d[k] = v.toArray()
+
+        # Create pandas DataFrame
+        yield pd.DataFrame(dicts)
+
+
+    for partition in df.rdd.mapPartitions(convert_to_pandas).toLocalIterator():
         rows_processed = rows_processed + partition.shape[0]
         partitions_processed = partitions_processed + 1
 
