@@ -10,12 +10,12 @@ source:
 
 requirements:
   build:
-    - python 3.6.*
+    - python 3.*
     - setuptools
 
   # Any packages required to run your package
   run:
-    - python 3.6.*
+    - python 3.*
     - numpy
     - pandas
     - psutil
