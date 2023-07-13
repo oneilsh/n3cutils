@@ -65,30 +65,31 @@ def vectorize(df: DataFrame,
 
     keep_df = df.select(id_col, *keep_cols)
 
-
-    # lookup vector name columns if they exist
-    vector_names_cols = []
-    for vector_col in vector_cols:
-        if vector_col + "_names" in df.columns:
-            vector_names_cols.append(vector_col + "_names")
+    output_col = output_prefix + "_features"
+    output_col_names = output_prefix + "_names"
+    if output_col in df.columns:
+        raise ValueError(f"Cannot overwrite dataframe input column '{output_col}' with output features. Please change your output prefix or rename the input column.")
+    if output_col_names in df.columns:
+        raise ValueError(f"Cannot overwrite dataframe input column '{output_col_names}' with output features names. Please change your output prefix or rename the input column.")
 
     if len(boolean_cols) > 0:
-        df = _vectorize_booleans(df, boolean_cols, output_prefix + "_features", drop_inputs)
+        df = _vectorize_booleans(df, boolean_cols, output_col, drop_inputs)
 
     if len(continuous_cols) > 0:
-        df = _vectorize_continuous(df, continuous_cols, output_prefix + "_features", scale, drop_inputs)
+        df = _vectorize_continuous(df, continuous_cols, output_col, scale, drop_inputs)
 
     if len(date_cols) > 0:
-        df = _vectorize_dates(df, date_cols, "2018-01-01", output_prefix + "_features", scale, drop_inputs)
+        df = _vectorize_dates(df, date_cols, "2018-01-01", output_col, scale, drop_inputs)
 
     if len(categorical_cols) > 0:
-        df = _vectorize_categoricals(df, categorical_cols, output_prefix + "_features", drop_inputs)
+        df = _vectorize_categoricals(df, categorical_cols, output_col, drop_inputs)
 
     if len(vector_cols) > 0:
-        df = _vectorize_vectors(df, vector_cols, output_prefix + "_features", scale_vectors, drop_inputs)
+        df = _vectorize_vectors(df, vector_cols, output_col, scale_vectors, drop_inputs)
+        return df
 
     if drop_unused:
-        df = df.select(id_col, output_prefix + "_features", output_prefix + "_features_names")
+        df = df.select(id_col, output_col, output_col_names)
 
     if len(keep_cols) > 0:
         # dont' keep anything that's still there (e.g. if keep_cols was set but nothing dropped)
@@ -111,6 +112,7 @@ def _vectorize_vectors(df,
         raise ValueError("No vector columns given to vectorize!")
 
 
+
     # Create a VectorAssembler to merge all the transformed columns into a single vector column
     assembler = VectorAssembler(
         inputCols=vector_cols,
@@ -118,6 +120,7 @@ def _vectorize_vectors(df,
         handleInvalid = "skip"
     )
     df = assembler.transform(df)
+
 
     if scale:
         scaler = StandardScaler(
@@ -129,9 +132,7 @@ def _vectorize_vectors(df,
         df = scaler.fit(df).transform(df)
         df = df.drop("temp_vector_features").withColumnRenamed("temp_scaled_vector_features", "temp_vector_features")
 
-
     df = _do_merge_vectors(df, merge_into, "temp_vector_features")
-
 
     ## For vector columns, e.g. some_features, we look for an existing names column, e.g. some_features_names.
     ## if it doesn't exist, we construct it
@@ -162,9 +163,10 @@ def _vectorize_vectors(df,
         df = df.drop(merge_into_names, "temp_vector_feature_names")
         df = df.withColumnRenamed("temp_vector_names_all", merge_into_names)
 
-    df = df.drop("temp_vector_names_all", *[col for col in df.columns if col.endswith("_temp_names")])
-
     if drop:
+        # don't drop our new output columns if they happen to be the same name as the input!
+        vector_cols = [col for col in vector_cols if col != merge_into]
+        vector_cols_names = [col for col in vector_cols_names if col != merge_into_names]
         df = df.drop(*vector_cols, *vector_cols_names)
 
     return df
@@ -209,6 +211,8 @@ def _vectorize_continuous(df,
     df = _add_string_to_column(df, merge_into_names, feature_names)
 
     if drop:
+        # don't drop our new output columns if they happen to be the same name as the input!
+        continuous_cols = [col for col in continuous_cols if col != merge_into]
         df = df.drop(*continuous_cols)
 
     return df
@@ -268,8 +272,9 @@ def _vectorize_dates(df,
 
     ## drop source cols if asked
     if drop:
+        # don't drop our new output columns if they happen to be the same name as the input!
+        date_cols = [col for col in date_cols if col != merge_into]
         df = df.drop(*date_cols)
-
 
     return df
 
@@ -332,6 +337,8 @@ def _vectorize_categoricals(df,
     df = df.drop(*to_drop)
 
     if drop:
+        # don't drop our new output columns if they happen to be the same name as the input!
+        categorical_cols = [col for col in categorical_cols if col != merge_into]
         df = df.drop(*categorical_cols)
 
     return df
@@ -363,6 +370,8 @@ def _vectorize_booleans(df,
     df = _do_merge_vectors(df, merge_into, "boolean_features")
 
     if drop:
+        # don't drop our new output columns if they happen to be the same name as the input!
+        boolean_cols = [col for col in boolean_cols if col != merge_into]
         df = df.drop(*boolean_cols)
 
     return df
