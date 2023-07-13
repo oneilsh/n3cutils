@@ -87,7 +87,6 @@ def vectorize(df: DataFrame,
     if len(vector_cols) > 0:
         df = _vectorize_vectors(df, vector_cols, output_prefix + "_features", scale_vectors, drop_inputs)
 
-    print("after vectorize_vectors", df.count())
     if drop_unused:
         df = df.select(id_col, output_prefix + "_features", output_prefix + "_features_names")
 
@@ -330,7 +329,6 @@ def _vectorize_categoricals(df,
     df = _add_string_to_column(df, merge_into_names, ",".join(feature_names_list), ",")
 
     to_drop = [col for col in df.columns if col.endswith("_temp_indexed") or col.endswith("temp_onehot")]
-    print(to_drop)
     df = df.drop(*to_drop)
 
     if drop:
