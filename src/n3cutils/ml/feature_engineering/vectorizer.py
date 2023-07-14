@@ -66,7 +66,8 @@ def vectorize(df: DataFrame,
     keep_df = df.select(id_col, *keep_cols)
 
     output_col = output_prefix + "_features"
-    output_col_names = output_prefix + "_names"
+    output_col_names = output_prefix + "_features_names"
+    
     if output_col in df.columns:
         raise ValueError(f"Cannot overwrite dataframe input column '{output_col}' with output features. Please change your output prefix or rename the input column.")
     if output_col_names in df.columns:
