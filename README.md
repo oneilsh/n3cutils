@@ -1,5 +1,7 @@
 # Publishing Conda Libraries
 
+test
+
 This repository template is setup to publish a Python package into Foundry.
 
 By default, the repository name at the time of the bootstrap is used as the name of the conda package.
