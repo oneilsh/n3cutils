@@ -1,0 +1,3 @@
+---
+title: "Update Conda dependencies [skip ci]"
+message: This change attempts to upgrade the Conda dependencies of the repository.

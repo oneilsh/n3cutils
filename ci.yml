@@ -61,6 +61,7 @@ jobs:
       export ORG_GRADLE_PROJECT_bearerToken="${JOB_TOKEN}"
       export ORG_GRADLE_PROJECT_transformsRepoRid="${REPOSITORY_RID}"
       export ORG_GRADLE_PROJECT_mavenProxyRepoUri="${ORG_GRADLE_PROJECT_artifactsUri}/repositories/${REPOSITORY_RID}/contents/migration/maven"
+      export ORG_GRADLE_PROJECT_applyCondaLocksPatch="true"
 
       if [ ! -z "${JEMMA_TAG:-}" ]; 
       then

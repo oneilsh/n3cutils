@@ -1,0 +1,4 @@
+---
+title: "Patch repository with new backing repositories [skip ci]"
+message: New repositories were auto-configured as backing repositories for this repository
+  based on the dependencies required.
